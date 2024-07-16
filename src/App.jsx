@@ -93,6 +93,8 @@ function App() {
           sep +
           (idxRow + 1) +
           sep +
+          row.nbHits +
+          sep +
           row.processingTimeMS +
           sep +
           colSubTitles[idxCol] +
@@ -213,6 +215,7 @@ function App() {
                     rootElementText({ nbHits, processingTimeMS }) {
                       stateTable[idx].map((row) => {
                         row.processingTimeMS = processingTimeMS;
+                        row.nbHits = nbHits;
                         return row;
                       });
 
