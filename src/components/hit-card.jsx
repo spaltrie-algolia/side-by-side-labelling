@@ -13,8 +13,6 @@ class HitCard extends React.Component {
     this.setStateTable = props.setStateTable;
     this.matrixCol = props.matrixCol;
     this.matrixRow = props.matrixRow;
-    console.log("ColRow:", this.matrixCol, this.matrixRow);
-    //console.log("props.stateTable1:", this.stateTable)
   }
 
   render() {

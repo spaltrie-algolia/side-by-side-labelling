@@ -1,6 +1,12 @@
 import { useState } from "react";
 import algoliasearch from "algoliasearch/lite";
-import { InstantSearch, SearchBox, Hits, Configure } from "react-instantsearch";
+import {
+  InstantSearch,
+  SearchBox,
+  Hits,
+  Configure,
+  Stats,
+} from "react-instantsearch";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -45,21 +51,22 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+const emptyState = [
+  { id: "0", value: "?" },
+  { id: "1", value: "?" },
+  { id: "2", value: "?" },
+  { id: "3", value: "?" },
+  { id: "4", value: "?" },
+  { id: "5", value: "?" },
+  { id: "6", value: "?" },
+  { id: "7", value: "?" },
+  { id: "8", value: "?" },
+  { id: "9", value: "?" },
+];
 function App() {
   const _table = [];
   for (let i = 0; i < 5; i++) {
-    _table.push([
-      { id: "0", value: "?" },
-      { id: "1", value: "?" },
-      { id: "2", value: "?" },
-      { id: "3", value: "?" },
-      { id: "4", value: "?" },
-      { id: "5", value: "?" },
-      { id: "6", value: "?" },
-      { id: "7", value: "?" },
-      { id: "8", value: "?" },
-      { id: "9", value: "?" },
-    ]);
+    _table.push(emptyState);
   }
   const [stateTable, setStateTable] = useState(_table);
   const [query, setQuery] = useState("");
@@ -84,7 +91,9 @@ function App() {
           sep +
           row.imageLink +
           sep +
-          idxRow +
+          (idxRow + 1) +
+          sep +
+          row.processingTimeMS +
           sep +
           colSubTitles[idxCol] +
           "\n";
@@ -96,33 +105,17 @@ function App() {
   function resetTable() {
     _table.length = 0;
     for (let i = 0; i < 5; i++) {
-      _table.push([
-        { id: "0", value: "?" },
-        { id: "1", value: "?" },
-        { id: "2", value: "?" },
-        { id: "3", value: "?" },
-        { id: "4", value: "?" },
-        { id: "5", value: "?" },
-        { id: "6", value: "?" },
-        { id: "7", value: "?" },
-        { id: "8", value: "?" },
-        { id: "9", value: "?" },
-      ]);
+      _table.push(emptyState);
     }
     setStateTable(_table);
   }
-  //resetTable();
 
   function onUpdateTableItem(e) {
-    //console.log("onUpdateTableItem");
-    //e.stopPropagation();
-
     setStateTable((state) => {
       const newState = state.map((col, idx) => {
         const _col = idx;
         return col.map((row) => {
           if (row.id == this.row && _col == this.col) {
-            //console.log("item.id2", item.id, e.target.value)
             return (row = { ...row, value: e.target.value });
           } else {
             return row;
@@ -130,53 +123,18 @@ function App() {
         });
       });
 
-      //state[this.row] = newState;
-      //console.log('state after:', newState);
       return newState;
     });
   }
 
-  // function Hit(params) {
-  //   const { hit } = params;
-  //   //console.log(JSON.stringify(params));
-  //   let img = "";
-  //   if (hit.pictures && hit.pictures.length > 0) {
-  //     hit.img =
-  //       "https://image.darty.com/server?type=image&source=" +
-  //       hit.pictures[0].algoliaPict;
-  //   }
-  //   hit.title = hit.searchText;
-  //   hit.description = hit.pointsForts;
-
-  //   return (
-  //     <article>
-  //       <HitCard
-  //         hit={hit}
-  //         stateTable={stateTable}
-  //         setStateTable={onUpdateTableItem}
-  //         col={0}
-  //         row={hit.__position - 1}
-  //       ></HitCard>
-  //     </article>
-  //   );
-  // }
   var _query = "";
   const queryHook = (_q, search) => {
     _query = _q;
-    // if (_query === query) return;
-    // resetTable();
-    // sleep(500);
-    // setQuery(_query);
-    // // searchClients.map((sc, idx) => {
-    // //   const index = sc.initIndex(indexNames[idx]);
-    // //   index.search(query);
-    // // });
-    // //search(query);
   };
-  const runQuery = () => {
+  const runQuery = (event) => {
     if (_query === query) return;
     resetTable();
-    sleep(500);
+    sleep(100);
     setQuery(_query);
   };
   return (
@@ -190,7 +148,7 @@ function App() {
                 queryHook={queryHook}
                 // searchAsYouType={false}
                 onSubmit={(event) => {
-                  runQuery();
+                  runQuery(event);
                 }}
               />
             </Col>
@@ -249,7 +207,19 @@ function App() {
                   hitsPerPage={10}
                   key={`cfg-table-${idx}`}
                 />
+                <Stats
+                  className="statsAlgolia"
+                  translations={{
+                    rootElementText({ nbHits, processingTimeMS }) {
+                      stateTable[idx].map((row) => {
+                        row.processingTimeMS = processingTimeMS;
+                        return row;
+                      });
 
+                      return `(${nbHits.toLocaleString()} results found in ${processingTimeMS.toLocaleString()}ms)`;
+                    },
+                  }}
+                />
                 <Hits
                   key={`hits-table-${idx}`}
                   hitComponent={({ hit }) => {

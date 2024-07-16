@@ -10,8 +10,6 @@ const radios = [
   { name: "V", value: "2", variant: "outline-success" },
 ];
 
-var nb = 0;
-
 class MyToggleButton extends React.Component {
   constructor(props) {
     super(props);
@@ -20,15 +18,6 @@ class MyToggleButton extends React.Component {
     this.objectID = props.objectID;
     this.stateTable = props.stateTable;
     this.setStateTable = props.setStateTable;
-
-    //console.log("colRow", this.col, this.row);
-    console.log("stateTable", this.stateTable);
-    //    console.log('props',props)
-
-    // this.state = {
-    //   list: this.stateTable,
-    // }
-    //console.log("props.stateTable2: ", this.stateTable)
   }
 
   onUpdateItem = (e) => this.onUpdateTable(e);
