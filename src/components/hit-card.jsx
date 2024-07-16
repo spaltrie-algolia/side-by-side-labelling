@@ -42,10 +42,10 @@ class HitCard extends React.Component {
         <Card.Footer className="alert alert-primary">
           <span>{this.hit.objectID}</span>
           <Badge className="floatBadgeRight" bg="primary">
-            {this.matrixRow}
+            {this.matrixRow + 1}
           </Badge>
           <Badge className="floatBadgeLeft" bg="success">
-            {this.matrixCol}
+            {this.matrixCol + 1}
           </Badge>
         </Card.Footer>
       </Card>
