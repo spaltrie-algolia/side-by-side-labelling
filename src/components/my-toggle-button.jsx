@@ -6,7 +6,7 @@ import React from "react";
 const radios = [
   { name: "?", value: "?", variant: "outline-info" },
   { name: "X", value: "0", variant: "outline-danger" },
-  { name: "-", value: "1", variant: "outline-secondary" },
+  { name: "-", value: "1", variant: "outline-warning" },
   { name: "V", value: "2", variant: "outline-success" },
 ];
 

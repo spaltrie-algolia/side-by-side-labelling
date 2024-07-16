@@ -4,6 +4,8 @@ import React from "react";
 import Card from "react-bootstrap/Card";
 import MyToggleButton from "./my-toggle-button";
 import Badge from "react-bootstrap/Badge";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
 
 class HitCard extends React.Component {
   constructor(props) {
@@ -21,7 +23,14 @@ class HitCard extends React.Component {
     state.objectID = this.hit.objectID;
     state.imageLink = this.hit.img;
     state.title = this.hit.title;
-
+    const Link = ({ id, children, title }) => (
+      <OverlayTrigger
+        placement="right"
+        overlay={<Tooltip id={id}>{title}</Tooltip>}
+      >
+        <a>{children}</a>
+      </OverlayTrigger>
+    );
     return (
       <Card key={`card-${this.matrixCol}-${this.hit.objectID}`}>
         <Card.Img variant="top" src={this.hit.img} />
@@ -33,7 +42,9 @@ class HitCard extends React.Component {
             stateTable={this.stateTable}
             setStateTable={this.setStateTable}
           ></MyToggleButton>
-          <Card.Title className="overflow">{this.hit.title}</Card.Title>
+          <Card.Title className="overflow">
+            <Link title={this.hit.title}>{this.hit.title}</Link>
+          </Card.Title>
           <Card.Text>
             {this.hit.brandName} |{" "}
             {this.hit.productMarketplace ? "MktPlc" : "Darty"}
@@ -42,7 +53,7 @@ class HitCard extends React.Component {
         <Card.Footer className="alert alert-primary">
           <span>{this.hit.objectID}</span>
           <Badge className="floatBadgeRight" bg="primary">
-            {this.matrixRow + 1}
+            #{this.matrixRow + 1}
           </Badge>
           <Badge className="floatBadgeLeft" bg="success">
             {this.matrixCol + 1}
