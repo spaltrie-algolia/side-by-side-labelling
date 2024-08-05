@@ -97,7 +97,7 @@ function App() {
     console.log("Labelling", stateTable);
     const sep = "|";
     let csv =
-      "#col (index x model)" +
+      "#" +
       sep +
       "query" +
       sep +
