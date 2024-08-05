@@ -4,13 +4,14 @@ import {
   InstantSearch,
   SearchBox,
   Hits,
-  Configure,
+  //Configure,
+  useConfigure,
   Stats,
 } from "react-instantsearch";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
+import { Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 import "./App.css";
@@ -36,17 +37,31 @@ searchClients.push(
 
 const indexNames = [];
 indexNames.push("alg_neuralsearch_test_darty_prod_es6");
-indexNames.push("darty_prod_es6");
 indexNames.push("darty_prod_es6_minilm");
+indexNames.push("darty_prod_es6_USE_conf_v2");
 indexNames.push("darty_prod_es6_old");
 indexNames.push("darty_prod_es6_conf_v2");
 
 const colSubTitles = [];
 colSubTitles.push("USE - Prod Darty");
-colSubTitles.push("USE - New Config");
-colSubTitles.push("MiniLM - New Config");
-colSubTitles.push("GTE Tiny - New Config");
-colSubTitles.push("GTE Tiny - Config Alt Weights");
+colSubTitles.push("MiniLM - Config v2");
+colSubTitles.push("USE - Config v2");
+colSubTitles.push("GTE Tiny - Config v1");
+colSubTitles.push("GTE Tiny - Config v2");
+
+const ButtonTooltip = ({ id, children, title }) => (
+  <OverlayTrigger
+    placement="bottom"
+    overlay={
+      <Tooltip style={{ marginTop: "1rem" }} id={id}>
+        {title}
+      </Tooltip>
+    }
+  >
+    <a>{children}</a>
+  </OverlayTrigger>
+);
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -63,6 +78,13 @@ const emptyState = [
   { id: "8", value: "?" },
   { id: "9", value: "?" },
 ];
+
+function CustomConfigure(props) {
+  // eslint-disable-next-line no-unused-vars
+  const { refine } = useConfigure(props);
+  return null;
+}
+
 function App() {
   const _table = [];
   for (let i = 0; i < 5; i++) {
@@ -70,6 +92,33 @@ function App() {
   }
   const [stateTable, setStateTable] = useState(_table);
   const [query, setQuery] = useState("");
+
+  function processLabellingHeader() {
+    console.log("Labelling", stateTable);
+    const sep = "|";
+    let csv =
+      "#col (index x model)" +
+      sep +
+      "query" +
+      sep +
+      "objectID" +
+      sep +
+      "title" +
+      sep +
+      "Labelling value" +
+      sep +
+      "imageLink" +
+      sep +
+      "#row (hits)" +
+      sep +
+      "nbHits" +
+      sep +
+      "processingTimeMS" +
+      sep +
+      "model x index tested" +
+      "\n";
+    navigator.clipboard.writeText(csv);
+  }
 
   function processLabelling() {
     console.log("Labelling", stateTable);
@@ -154,15 +203,28 @@ function App() {
                 }}
               />
             </Col>
-            <Col md="1">
-              <Button
-                variant="warning"
-                onClick={(e) => {
-                  processLabelling();
-                }}
-              >
-                <i className="bi bi-clipboard"></i>
-              </Button>
+            <Col md="1" style={{ padding: "0" }}>
+              <ButtonTooltip title="Copy labelling results into clipboard ( CSV format with separator | )">
+                <Button
+                  variant="warning"
+                  style={{ marginRight: "0.25rem" }}
+                  onClick={(e) => {
+                    processLabelling();
+                  }}
+                >
+                  <i className="bi bi-table"></i>
+                </Button>
+              </ButtonTooltip>
+              <ButtonTooltip title="Copy CSV header into clipboard">
+                <Button
+                  variant="info"
+                  onClick={(e) => {
+                    processLabellingHeader();
+                  }}
+                >
+                  <i className="bi bi-card-heading"></i>
+                </Button>
+              </ButtonTooltip>
             </Col>
           </Row>
           <Row style={{ textAlign: "left", paddingTop: "0.25rem" }}>
@@ -201,11 +263,12 @@ function App() {
                 searchClient={searchClients[idx]}
                 indexName={indexNames[idx]}
               >
-                <Configure
+                <CustomConfigure
                   query={query}
                   enableRules={false}
                   analytics={false}
                   filters=""
+                  getRankingInfo={true}
                   hitsPerPage={10}
                   key={`cfg-table-${idx}`}
                 />

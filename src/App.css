@@ -118,3 +118,24 @@ div.card-footer{
 div.statsAlgolia {
   font-size: 12px;
 }
+
+
+.badge-header-ranking {
+  position: absolute;
+  left: 0.25rem;
+  top: 0.25rem;
+}
+
+.badge-header-info {
+  position: absolute;
+  right: 0.25rem;
+  top: 0.25rem;
+}
+
+div.card-header {
+  padding: 0 !important;
+  background-color: white;
+}
+img.card-img-top {
+  padding: 0 !important;
+}

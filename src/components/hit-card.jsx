@@ -4,8 +4,62 @@ import React from "react";
 import Card from "react-bootstrap/Card";
 import MyToggleButton from "./my-toggle-button";
 import Badge from "react-bootstrap/Badge";
+import Popover from "react-bootstrap/Popover";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
+
+function RankingInfo({ ri }) {
+  return (
+    <div>
+      <React.Fragment>
+        <span>
+          userScore &emsp;
+          <Badge className="float-end bg-secondary">{ri.userScore}</Badge>
+        </span>
+        <br />
+      </React.Fragment>
+
+      {ri.keywordScore !== undefined && (
+        <React.Fragment>
+          <span>
+            keywordScore &emsp;
+            <Badge className="float-end bg-danger">
+              {Number(ri.keywordScore).toFixed(2)}
+            </Badge>
+          </span>
+          <br />
+        </React.Fragment>
+      )}
+      {ri.semanticScore !== undefined && (
+        <React.Fragment>
+          <span>
+            semanticScore &emsp;
+            <Badge className="float-end bg-primary">
+              {Number(ri.semanticScore).toFixed(2)}
+            </Badge>
+          </span>
+          <br />
+        </React.Fragment>
+      )}
+      {ri.neuralScore !== undefined && (
+        <React.Fragment>
+          <span>
+            neuralScore &emsp;
+            <Badge className="float-end bg-primary">
+              {Number(ri.neuralScore).toFixed(2)}
+            </Badge>
+          </span>
+          <br />
+        </React.Fragment>
+      )}
+      {/* {ri.mergeInfo !== undefined && (
+        <React.Fragment>
+          <span>mergeInfo: {JSON.stringify(ri.mergeInfo)}</span><br />
+        </React.Fragment>
+      )} */}
+    </div>
+  );
+}
 
 class HitCard extends React.Component {
   constructor(props) {
@@ -23,6 +77,34 @@ class HitCard extends React.Component {
     state.objectID = this.hit.objectID;
     state.imageLink = this.hit.img;
     state.title = this.hit.title;
+
+    const ri = this.hit._rankingInfo;
+    const popover = (
+      <Popover>
+        <Popover.Body>
+          <RankingInfo ri={ri} />
+        </Popover.Body>
+      </Popover>
+    );
+    console.log("ri:", this.hit._rankingInfo);
+    let badgeBg = "";
+    let badgeLabel = "";
+    if (ri["keywordScore"] !== undefined) {
+      badgeBg = "danger";
+      badgeLabel = "Keyword";
+    }
+    if (ri["neuralScore"] !== undefined || ri["semanticScore"] !== undefined) {
+      badgeBg = "primary";
+      badgeLabel = "Neural";
+    }
+    if (
+      ri["keywordScore"] !== undefined &&
+      (ri["neuralScore"] !== undefined || ri["semanticScore"] !== undefined)
+    ) {
+      badgeBg = "warning";
+      badgeLabel = "Key+Neural";
+    }
+
     const Link = ({ id, children, title }) => (
       <OverlayTrigger
         placement="right"
@@ -33,7 +115,15 @@ class HitCard extends React.Component {
     );
     return (
       <Card key={`card-${this.matrixCol}-${this.hit.objectID}`}>
-        <Card.Img variant="top" src={this.hit.img} />
+        <Card.Header>
+          <Badge className="badge-header-ranking" bg={badgeBg}>
+            {badgeLabel}
+          </Badge>
+          <OverlayTrigger trigger="hover" placement="bottom" overlay={popover}>
+            <Badge className="bg-secondary badge-header-info">Info</Badge>
+          </OverlayTrigger>
+          <Card.Img variant="top" src={this.hit.img} />
+        </Card.Header>
         <Card.Body>
           <MyToggleButton
             col={this.matrixCol}
