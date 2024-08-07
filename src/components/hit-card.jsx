@@ -76,7 +76,7 @@ class HitCard extends React.Component {
 
     state.objectID = this.hit.objectID;
     state.imageLink = this.hit.img;
-    state.title = this.hit.title;
+    state.title = this.hit._title;
 
     const ri = this.hit._rankingInfo;
     const popover = (
@@ -86,7 +86,7 @@ class HitCard extends React.Component {
         </Popover.Body>
       </Popover>
     );
-    console.log("ri:", this.hit._rankingInfo);
+    //console.log("ri:", this.hit._rankingInfo);
     let badgeBg = "";
     let badgeLabel = "";
     if (ri["keywordScore"] !== undefined) {
@@ -133,20 +133,17 @@ class HitCard extends React.Component {
             setStateTable={this.setStateTable}
           ></MyToggleButton>
           <Card.Title className="overflow">
-            <Link title={this.hit.title}>{this.hit.title}</Link>
+            <Link title={this.hit._title}>{this.hit._title}</Link>
           </Card.Title>
           <Card.Text>
-            {this.hit.brandName} |{" "}
-            {this.hit.productMarketplace ? "MktPlc" : "Darty"}
+            {/* TODO : change ternary by eval() */}
+            {this.hit._tag1} | {this.hit._tag2}
           </Card.Text>
         </Card.Body>
         <Card.Footer className="alert alert-primary">
           <span>{this.hit.objectID}</span>
           <Badge className="floatBadgeRight" bg="primary">
             #{this.matrixRow + 1}
-          </Badge>
-          <Badge className="floatBadgeLeft" bg="success">
-            {this.matrixCol + 1}
           </Badge>
         </Card.Footer>
       </Card>

@@ -11,43 +11,25 @@ import {
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { Button, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Button, OverlayTrigger, Tooltip, Badge } from "react-bootstrap";
+
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 import "./App.css";
 import "./components/hit-card";
 import HitCard from "./components/hit-card";
+import appConfig from "./AppConfig";
 
 const searchClients = [];
-searchClients.push(
-  algoliasearch("Z0YPI1PLPQ", "ced123667f21fd51c09a3b81a4ae4b30")
-);
-searchClients.push(
-  algoliasearch("640GUGFBUQ", "59660e134b3e949a726edb8ca7586456")
-);
-searchClients.push(
-  algoliasearch("640GUGFBUQ", "59660e134b3e949a726edb8ca7586456")
-);
-searchClients.push(
-  algoliasearch("7IT45BYDCK", "eea86e78cd97458cc170f5b92f9b3c86")
-);
-searchClients.push(
-  algoliasearch("7IT45BYDCK", "eea86e78cd97458cc170f5b92f9b3c86")
-);
-
 const indexNames = [];
-indexNames.push("alg_neuralsearch_test_darty_prod_es6");
-indexNames.push("darty_prod_es6_minilm");
-indexNames.push("darty_prod_es6_USE_conf_v2");
-indexNames.push("darty_prod_es6_old");
-indexNames.push("darty_prod_es6_conf_v2");
+const indexTitles = [];
 
-const colSubTitles = [];
-colSubTitles.push("USE - Prod Darty");
-colSubTitles.push("MiniLM - Config v2");
-colSubTitles.push("USE - Config v2");
-colSubTitles.push("GTE Tiny - Config v1");
-colSubTitles.push("GTE Tiny - Config v2");
+for (const conf of appConfig.indices) {
+  //console.log("conf", conf);
+  searchClients.push(algoliasearch(conf.appId, conf.apiKey));
+  indexNames.push(conf.indexName);
+  indexTitles.push(conf.indexTitle);
+}
 
 const ButtonTooltip = ({ id, children, title }) => (
   <OverlayTrigger
@@ -66,18 +48,10 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const emptyState = [
-  { id: "0", value: "?" },
-  { id: "1", value: "?" },
-  { id: "2", value: "?" },
-  { id: "3", value: "?" },
-  { id: "4", value: "?" },
-  { id: "5", value: "?" },
-  { id: "6", value: "?" },
-  { id: "7", value: "?" },
-  { id: "8", value: "?" },
-  { id: "9", value: "?" },
-];
+const nbHits = appConfig.nbHits;
+const emptyState = [...Array(nbHits).keys()].map((idx) => {
+  return { id: idx.toString(), value: "?" };
+});
 
 function CustomConfigure(props) {
   // eslint-disable-next-line no-unused-vars
@@ -87,14 +61,14 @@ function CustomConfigure(props) {
 
 function App() {
   const _table = [];
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < appConfig.indices.length; i++) {
     _table.push(emptyState);
   }
   const [stateTable, setStateTable] = useState(_table);
   const [query, setQuery] = useState("");
 
   function processLabellingHeader() {
-    console.log("Labelling", stateTable);
+    //console.log("Labelling", stateTable);
     const sep = "|";
     let csv =
       "#" +
@@ -121,7 +95,7 @@ function App() {
   }
 
   function processLabelling() {
-    console.log("Labelling", stateTable);
+    //console.log("Labelling", stateTable);
     var csv = "";
     var ind = 0;
     const sep = "|";
@@ -146,7 +120,7 @@ function App() {
           sep +
           row.processingTimeMS +
           sep +
-          colSubTitles[idxCol] +
+          indexTitles[idxCol] +
           "\n";
       });
     });
@@ -155,7 +129,7 @@ function App() {
 
   function resetTable() {
     _table.length = 0;
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < appConfig.indices.length; i++) {
       _table.push(emptyState);
     }
     setStateTable(_table);
@@ -191,9 +165,15 @@ function App() {
   return (
     <>
       <InstantSearch searchClient={searchClients[0]} indexName={indexNames[0]}>
-        <Container fluid="md">
+        <Container
+          fluid="md"
+          className="sticky-top"
+          style={{ backgroundColor: "white" }}
+        >
           <Row>
-            <h1>Labelling App</h1>
+            <Col md="12">
+              <h1>Labelling App</h1>
+            </Col>
             <Col md="11">
               <SearchBox
                 queryHook={queryHook}
@@ -227,17 +207,47 @@ function App() {
               </ButtonTooltip>
             </Col>
           </Row>
-          <Row style={{ textAlign: "left", paddingTop: "0.25rem" }}>
+          <Row
+            style={{
+              textAlign: "left",
+              paddingTop: "0.25rem",
+              paddingBottom: "0.5rem",
+              fontSize: "small",
+            }}
+          >
             {query ? (
-              <h5>
-                Results for: <span>{query}</span>
-              </h5>
+              <span>
+                <i>
+                  Results for: <span>{query}</span>
+                </i>
+              </span>
             ) : (
-              <h5>Results for Empty Search</h5>
+              <span>
+                <i>Results for Empty Search</i>
+              </span>
             )}
           </Row>
+          <Row>
+            {_table.map((item, idx) => (
+              <Col
+                key={`col-table-${idx}-2`}
+                style={{
+                  width: "20%",
+                  padding: "0.25rem",
+                }}
+                className="border"
+              >
+                <Badge className="float-start" bg="success">
+                  {idx + 1}
+                </Badge>
+                <div style={{ marginTop: "0.5rem", marginBottom: "0.5rem" }}>
+                  <h5>{searchClients[idx].appId}</h5>
+                  <span>{indexTitles[idx]}</span>
+                </div>
+              </Col>
+            ))}
+          </Row>
         </Container>
-        <br />
       </InstantSearch>
       <Container>
         <Row>
@@ -246,18 +256,10 @@ function App() {
               key={`col-table-${idx}`}
               style={{
                 width: "20%",
-                paddingLeft: "0.25rem",
+                padding: "0.25rem",
               }}
+              className="border"
             >
-              <div
-                style={{
-                  marginBottom: "0.4rem",
-                }}
-              >
-                <h5>{searchClients[idx].appId}</h5>
-                <span>{colSubTitles[idx]}</span>
-              </div>
-
               <InstantSearch
                 key={`is-${idx}`}
                 searchClient={searchClients[idx]}
@@ -269,11 +271,16 @@ function App() {
                   analytics={false}
                   filters=""
                   getRankingInfo={true}
-                  hitsPerPage={10}
+                  hitsPerPage={nbHits}
                   key={`cfg-table-${idx}`}
                 />
                 <Stats
                   className="statsAlgolia"
+                  style={{
+                    marginTop: "0.25rem",
+                    marginBottom: "0.25rem",
+                    fontSize: "small",
+                  }}
                   translations={{
                     rootElementText({ nbHits, processingTimeMS }) {
                       stateTable[idx].map((row) => {
@@ -288,6 +295,7 @@ function App() {
                 />
                 <Hits
                   key={`hits-table-${idx}`}
+                  style={{ marginLeft: "-1px" }}
                   hitComponent={({ hit }) => {
                     let img = "";
                     if (hit.pictures && hit.pictures.length > 0) {
@@ -295,8 +303,14 @@ function App() {
                         "https://image.darty.com/server?type=image&source=" +
                         hit.pictures[0].algoliaPict;
                     }
-                    hit.title = hit.searchText;
-                    hit.description = hit.pointsForts;
+                    hit._title = eval(appConfig.indices[idx].rowTitle);
+                    hit._tag1 = appConfig.indices[idx].rowTag1
+                      ? eval(appConfig.indices[idx].rowTag1)
+                      : null;
+                    hit._tag2 = appConfig.indices[idx].rowTag2
+                      ? eval(appConfig.indices[idx].rowTag2)
+                      : null;
+                    //hit._description = hit.pointsForts;
 
                     return (
                       <article>
