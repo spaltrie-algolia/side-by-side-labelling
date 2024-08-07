@@ -1,5 +1,5 @@
 const appConfig = {
-   nbHits: 15,
+   nbHits: 20,
    indices: [
    {
       appId: "Z0YPI1PLPQ",
