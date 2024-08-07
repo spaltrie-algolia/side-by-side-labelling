@@ -8,10 +8,16 @@ import {
   useConfigure,
   Stats,
 } from "react-instantsearch";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import { Button, OverlayTrigger, Tooltip, Badge } from "react-bootstrap";
+import {
+  Button,
+  OverlayTrigger,
+  Tooltip,
+  Badge,
+  ToastContainer,
+  Row,
+  Col,
+  Container,
+} from "react-bootstrap";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
 
@@ -19,6 +25,7 @@ import "./App.css";
 import "./components/hit-card";
 import HitCard from "./components/hit-card";
 import appConfig from "./AppConfig";
+import CustomToast from "./components/custom-toast";
 
 const searchClients = [];
 const indexNames = [];
@@ -66,6 +73,8 @@ function App() {
   }
   const [stateTable, setStateTable] = useState(_table);
   const [query, setQuery] = useState("");
+  const [showResults, setShowResults] = useState(false);
+  const [showHeader, setShowHeader] = useState(false);
 
   function processLabellingHeader() {
     //console.log("Labelling", stateTable);
@@ -171,6 +180,29 @@ function App() {
           style={{ backgroundColor: "white" }}
         >
           <Row>
+            <ToastContainer
+              className="p-3"
+              position="top-end"
+              style={{
+                zIndex: 1,
+                padding: "3px",
+                marginTop: "-1rem",
+                marginRight: "6rem",
+              }}
+            >
+              <CustomToast
+                show={showHeader}
+                setShow={setShowHeader}
+                text="CSV header copied!"
+                variant="info"
+              ></CustomToast>
+              <CustomToast
+                show={showResults}
+                setShow={setShowResults}
+                text="CSV results copied!"
+                variant="warning"
+              ></CustomToast>
+            </ToastContainer>{" "}
             <Col md="12">
               <h1>Labelling App</h1>
             </Col>
@@ -189,6 +221,7 @@ function App() {
                   variant="warning"
                   style={{ marginRight: "0.25rem" }}
                   onClick={(e) => {
+                    setShowResults(true);
                     processLabelling();
                   }}
                 >
@@ -199,6 +232,7 @@ function App() {
                 <Button
                   variant="info"
                   onClick={(e) => {
+                    setShowHeader(true);
                     processLabellingHeader();
                   }}
                 >
