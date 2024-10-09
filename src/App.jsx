@@ -276,6 +276,8 @@ function App() {
                 </Badge>
                 <div style={{ marginTop: "0.5rem", marginBottom: "0.5rem" }}>
                   <h5>{searchClients[idx].appId}</h5>
+                  <small>{indexNames[idx]}</small>
+                  <br />
                   <span>{indexTitles[idx]}</span>
                 </div>
               </Col>

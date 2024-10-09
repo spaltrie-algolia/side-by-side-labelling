@@ -29,10 +29,10 @@ const appConfig = {
       rowTag2: "hit.productMarketplace ? 'MktPlc' : 'Darty'" 
    },
    {
-      appId: "7IT45BYDCK",
-      apiKey: "eea86e78cd97458cc170f5b92f9b3c86",
-      indexName: "darty_prod_es6_old",
-      indexTitle: "GTE Tiny - Config v1",
+      appId: "640GUGFBUQ",
+      apiKey: "59660e134b3e949a726edb8ca7586456",
+      indexName: "darty_prod_es6",
+      indexTitle: "Large Model - Config v2",
       rowTitle: "hit.searchText",
       rowTag1: "hit.brandName",
       rowTag2: "hit.productMarketplace ? 'MktPlc' : 'Darty'"
